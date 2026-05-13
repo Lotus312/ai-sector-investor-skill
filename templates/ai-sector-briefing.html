@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AI板块投资报告</title>
+<style>
+:root{--bg:#080d1a;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.07);--text:#e2e8f0;--muted:#94a3b8;--blue:#60a5fa;--purple:#a78bfa;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--orange:#f97316}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:10px;font-size:14px;line-height:1.5}
+.container{max-width:480px;margin:0 auto}
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;margin-bottom:10px;background:var(--card);border-radius:12px;border:1px solid var(--border)}
+.header-l{display:flex;align-items:center;gap:10px}
+.header-icon{font-size:28px}
+.header-info h1{font-size:16px;font-weight:700;background:linear-gradient(90deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-info .date{font-size:11px;color:var(--muted)}
+.signal{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap}
+.signal.warn{background:rgba(251,191,36,.12);color:var(--yellow);border:1px solid rgba(251,191,36,.25)}
+.signal.danger{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.signal.safe{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.25)}
+.card{background:var(--card);border-radius:12px;border:1px solid var(--border);padding:14px;margin-bottom:10px}
+.card-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;margin-bottom:12px}
+.card-title .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.card-title .tag{font-size:10px;color:var(--muted);margin-left:auto}
+.bar-group{margin-bottom:10px}
+.bar-group:last-child{margin-bottom:0}
+.bar-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.bar-label .name{color:var(--text)}
+.bar-label .val{font-weight:600}
+.bar-track{height:8px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px}
+.fear-wrap{display:flex;align-items:center;gap:20px;justify-content:center;padding:10px 0}
+.fear-ring{width:100px;height:100px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;position:relative}
+.fear-inner{width:72px;height:72px;border-radius:50%;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.fear-val{font-size:28px;font-weight:800}
+.fear-label{font-size:10px;color:var(--muted);margin-top:2px}
+.fear-legend{font-size:11px;color:var(--muted);line-height:1.8}
+.heat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.heat-item{background:rgba(255,255,255,0.03);border-radius:8px;padding:8px 10px}
+.heat-item .heat-row{display:flex;justify-content:space-between;align-items:center}
+.heat-item .heat-name{font-size:12px}
+.heat-item .heat-pct{font-size:11px;font-weight:600}
+.heat-item .heat-bar{height:5px;border-radius:3px;margin-top:4px}
+.heat-item .heat-note{font-size:10px;color:var(--muted);margin-top:2px}
+.section-label{font-size:13px;font-weight:700;margin:0 0 10px 0;display:flex;align-items:center;gap:6px}
+.section-label .bar{width:3px;height:14px;border-radius:2px;display:inline-block}
+.flow-row{display:flex;justify-content:space-around;text-align:center;margin-bottom:10px}
+.flow-item .flow-label{font-size:10px;color:var(--muted)}
+.flow-item .flow-val{font-size:15px;font-weight:700;margin-top:2px}
+.flow-bar-track{height:8px;background:rgba(255,255,255,0.08);border-radius:4px;display:flex;overflow:hidden;margin-top:2px}
+.flow-bar-north{background:var(--blue);border-radius:4px 0 0 4px}
+.flow-bar-main{background:var(--purple);border-radius:0 4px 4px 0}
+.flow-sub{display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--muted)}
+.sig-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.sig-item:last-child{border-bottom:none}
+.sig-icon{font-size:18px;flex-shrink:0}
+.sig-info{flex:1}
+.sig-name{font-size:13px;font-weight:600}
+.sig-reason{font-size:11px;color:var(--muted)}
+.sig-badge{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;flex-shrink:0}
+.sig-badge.sell{background:rgba(239,68,68,.15);color:var(--red)}
+.sig-badge.hold{background:rgba(251,191,36,.15);color:var(--yellow)}
+.sig-badge.buy{background:rgba(52,211,153,.15);color:var(--green)}
+.news-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;gap:8px;align-items:flex-start}
+.news-item:last-child{border-bottom:none}
+.news-tag{padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;flex-shrink:0;white-space:nowrap}
+.news-tag.up{background:rgba(52,211,153,.15);color:var(--green)}
+.news-tag.down{background:rgba(239,68,68,.15);color:var(--red)}
+.news-tag.mid{background:rgba(148,163,184,.12);color:var(--muted)}
+.news-body{font-size:12px;line-height:1.6}
+.fund-section{margin-bottom:12px}
+.fund-section:last-child{margin-bottom:0}
+.fund-section-title{font-size:12px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.fund-section-title .bar{width:3px;height:12px;border-radius:2px}
+.fund-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.fund-item{background:rgba(255,255,255,0.02);border-radius:6px;padding:6px 8px;border:1px solid rgba(255,255,255,0.04)}
+.fund-item .fund-name{font-size:11px;font-weight:600;margin-bottom:2px}
+.fund-item .fund-code{font-size:9px;color:var(--muted)}
+.fund-item .fund-type{font-size:9px;color:var(--muted);margin-top:1px}
+.fund-item .fund-sig{font-size:9px;margin-top:3px;padding:2px 6px;border-radius:4px;display:inline-block}
+.fund-sig.sell{background:rgba(239,68,68,.15);color:var(--red)}
+.fund-sig.hold{background:rgba(251,191,36,.15);color:var(--yellow)}
+.fund-sig.buy{background:rgba(52,211,153,.15);color:var(--green)}
+.advice-top{text-align:center;font-size:36px;margin:6px 0}
+.advice-title{text-align:center;font-size:15px;font-weight:700;color:var(--purple);margin-bottom:10px}
+.advice-list{font-size:12px;color:var(--muted);line-height:2}
+.advice-list b{color:var(--text)}
+.advice-footnote{margin-top:10px;padding:8px;border-radius:6px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.15);font-size:10px;color:var(--purple);text-align:center}
+.footer{text-align:center;color:var(--muted);font-size:10px;padding:10px 0;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container"></div>
+
+<script>
+// ============================================================
+// 数据注入点：此处替换为 Step 1.5 验证后的实际数据
+// ============================================================
+const DATA = {
+  "date": "YYYY年MM月DD日 周X",
+  "signal_level": "warn",
+  "signal_text": "🟡 中性偏谨慎",
+  "indices": [],
+  "fear_greed": {"value": 0, "zone": ""},
+  "flow": {"north_1d": 0, "north_5d": 0, "north_20d": 0, "main_1d": 0},
+  "sectors": [],
+  "funds": [],
+  "news": [],
+  "advice": "",
+  "sources": "",
+  "footer_text": ""
+};
+
+// ============================================================
+// 渲染函数
+// ============================================================
+const layers = {
+  up: { name: '上游 · 算力基础设施', color: 'var(--blue)', bg: 'var(--blue)', tip: '→ ETF为主，费率低适合波段' },
+  mid: { name: '中游 · 模型与平台', color: 'var(--purple)', bg: 'var(--purple)', tip: '→ 主动型为主，精选个股' },
+  down: { name: '下游 · 应用落地', color: 'var(--green)', bg: 'var(--green)', tip: '→ 主动型为主，挖掘黑马' }
+};
+
+function barColor(pct) {
+  if (pct >= 80) return 't-red';
+  if (pct >= 50) return 't-yellow';
+  return 't-green';
+}
+function barBg(pct) {
+  if (pct >= 80) return 'linear-gradient(90deg,var(--blue),var(--red))';
+  if (pct >= 50) return 'linear-gradient(90deg,var(--green),var(--yellow))';
+  return 'linear-gradient(90deg,var(--blue),var(--green))';
+}
+function sectorStatus(pct) {
+  if (pct >= 80) return '⚠高估';
+  if (pct >= 65) return '中高';
+  if (pct >= 35) return '正常';
+  if (pct >= 20) return '偏低';
+  return '低估';
+}
+function signalIcon(pct) {
+  if (pct >= 80) return '🔴';
+  if (pct >= 50) return '🟡';
+  return '🟢';
+}
+function sigBadge(pct) {
+  if (pct >= 80) return '<span class="sig-badge sell">减仓</span>';
+  if (pct >= 50) return '<span class="sig-badge hold">持有</span>';
+  return '<span class="sig-badge buy">建仓</span>';
+}
+function fundSigBadge(pct) {
+  if (pct >= 80) return '<span class="fund-sig sell">减仓</span>';
+  if (pct >= 50) return '<span class="fund-sig hold">持有</span>';
+  return '<span class="fund-sig buy">建仓</span>';
+}
+function changeColor(v) {
+  if (v > 3) return 'var(--green)';
+  if (v > 0) return 'var(--blue)';
+  return 'var(--red)';
+}
+function formatChange(v) { return (v >= 0 ? '+' : '') + v.toFixed(1) + '%'; }
+function formatFlow(v) { var s = v >= 0 ? '+' : ''; return s + v.toFixed(1) + '亿'; }
+function tagClass(impact) {
+  if (impact === '利好' || impact === '利好') return 'up';
+  if (impact === '利空' || impact === '利空') return 'down';
+  return 'mid';
+}
+
+function el(tag, cls, html, attrs) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (html) e.innerHTML = html;
+  if (attrs) for (var k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+
+function render() {
+  var root = document.querySelector('.container');
+  root.innerHTML = '';
+
+  // ---- HEADER ----
+  var signalCls = DATA.signal_level;
+  root.appendChild(el('div', 'header'));
+  var h = root.lastChild;
+  var hl = el('div', 'header-l');
+  hl.innerHTML = '<span class="header-icon">🤖</span><div class="header-info"><h1>AI板块投资报告</h1><div class="date">' + DATA.date + '</div></div>';
+  h.appendChild(hl);
+  h.appendChild(el('div', 'signal ' + (signalCls || 'warn'), DATA.signal_text || '🟡 中性偏谨慎'));
+
+  // ---- ① 估值温度计 ----
+  root.appendChild(el('div', 'card'));
+  var c = root.lastChild;
+  c.innerHTML = '<div class="card-title"><span class="dot" style="background:var(--blue)"></span>估值温度计<span class="tag">PE·近5年百分位</span></div>';
+  DATA.indices.forEach(function(idx) {
+    var bg = el('div', 'bar-group');
+    var pct = idx.pe_pct;
+    bg.innerHTML = '<div class="bar-label"><span class="name">' + idx.name + (pct >= 80 ? ' ⚠️' : '') + '</span><span class="val" style="color:' + (pct >= 80 ? 'var(--red)' : pct >= 50 ? 'var(--yellow)' : 'var(--green)') + '">' + pct + '%</span></div><div class="bar-track"><div class="bar-fill ' + barColor(pct) + '" style="width:' + pct + '%;background:' + barBg(pct) + '"></div></div>';
+    c.appendChild(bg);
+  });
+
+  // ---- ② 恐惧贪婪 ----
+  root.appendChild(el('div', 'card'));
+  c = root.lastChild;
+  c.innerHTML = '<div class="card-title"><span class="dot" style="background:var(--yellow)"></span>恐惧贪婪指数<span class="tag">今日</span></div>';
+  var fg = DATA.fear_greed;
+  var fgColor = fg.value >= 75 ? 'var(--red)' : fg.value >= 50 ? 'var(--yellow)' : fg.value >= 25 ? 'var(--orange)' : 'var(--green)';
+  var fgGrad = 'conic-gradient(var(--green) 0% 25%, var(--yellow) 25% 50%, var(--orange) 50% 75%, var(--red) 75% 100%)';
+  c.innerHTML += '<div class="fear-wrap"><div class="fear-ring" style="background:' + fgGrad + '"><div class="fear-inner"><span class="fear-val" style="color:' + fgColor + '">' + fg.value + '</span><span class="fear-label">' + fg.zone + '</span></div></div><div class="fear-legend"><div>🟢 0-25 极度恐惧</div><div>🟡 25-50 中性</div><div>🟠 50-75 偏贪婪</div><div>🔴 75-100 极度贪婪</div></div></div>';
+
+  // ---- ③ AI产业链细分赛道 ----
+  root.appendChild(el('div', 'card'));
+  c = root.lastChild;
+  c.innerHTML = '<div class="card-title"><span class="dot" style="background:var(--purple)"></span>AI产业链细分赛道<span class="tag">涨跌+估值</span></div>';
+
+  ['up', 'mid', 'down'].forEach(function(layer) {
+    var sectors = DATA.sectors.filter(function(s) { return s.layer === layer; });
+    if (sectors.length === 0) return;
+    var l = layers[layer];
+    c.appendChild(el('div', 'section-label', '<span class="bar" style="background:' + l.bg + '"></span>' + l.name));
+    var grid = el('div', 'heat-grid');
+    sectors.forEach(function(s) {
+      var item = el('div', 'heat-item');
+      item.innerHTML = '<div class="heat-row"><span class="heat-name">' + s.name + '</span><span class="heat-pct" style="color:' + changeColor(s.change) + '">' + formatChange(s.change) + '</span></div><div class="heat-bar" style="width:' + s.pe_pct + '%;background:' + barBg(s.pe_pct) + '"></div><div class="heat-note">PE分位' + s.pe_pct + '% · ' + sectorStatus(s.pe_pct) + '</div>';
+      grid.appendChild(item);
+    });
+    c.appendChild(grid);
+    c.appendChild(el('div', null, null, {style: 'height:6px'}));
+  });
+
+  // ---- ④ 资金流向 ----
+  root.appendChild(el('div', 'card'));
+  c = root.lastChild;
+  c.innerHTML = '<div class="card-title"><span class="dot" style="background:var(--orange)"></span>资金流向<span class="tag">电子·通信板块</span></div>';
+  c.innerHTML += '<div class="flow-row"><div class="flow-item"><div class="flow-label">北向·近1日</div><div class="flow-val" style="color:var(--blue)">' + formatFlow(DATA.flow.north_1d) + '</div></div><div class="flow-item"><div class="flow-label">北向·近5日</div><div class="flow-val" style="color:var(--blue)">' + formatFlow(DATA.flow.north_5d) + '</div></div><div class="flow-item"><div class="flow-label">北向·近20日</div><div class="flow-val" style="color:var(--blue)">' + formatFlow(DATA.flow.north_20d) + '</div></div></div>';
+  c.innerHTML += '<div class="flow-bar-track"><div class="flow-bar-north" style="width:60%"></div><div class="flow-bar-main" style="width:40%"></div></div><div class="flow-sub"><span>北向：' + formatFlow(DATA.flow.north_1d) + '（电子+通信）</span><span>主力：' + formatFlow(DATA.flow.main_1d) + '</span></div>';
+
+  // ---- ⑤ 择时信号面板 ----
+  root.appendChild(el('div', 'card'));
+  c = root.lastChild;
+  c.innerHTML = '<div class="card-title"><span class="dot" style="background:var(--purple)"></span>择时信号面板<span class="tag">多空判断</span></div>';
+  // 合并 sector 信号 + fund 层信号，取前6条
+  var signals = [];
+  DATA.sectors.forEach(function(s) {
+    signals.push({name: s.name, reason: 'PE分位' + s.pe_pct + '%', pct: s.pe_pct});
+  });
+  // 按 pct 降序排列，取前6
+  signals.sort(function(a, b) { return b.pct - a.pct; });
+  signals.slice(0, 6).forEach(function(sig) {
+    var item = el('div', 'sig-item');
+    item.innerHTML = '<span class="sig-icon">' + signalIcon(sig.pct) + '</span><div class="sig-info"><div class="sig-name">' + sig.name + '</div><div class="sig-reason">' + sig.reason + '</div></div>' + sigBadge(sig.pct);
+    c.appendChild(item);
+  });
+
+  // ---- ⑥ 资讯 ----
+  root.appendChild(el('div', 'card'));
+  c = root.lastChild;
+  c.innerHTML = '<div class="card-title"><span class="dot" style="background:var(--green)"></span>AI产业重要资讯<span class="tag">今日</span></div>';
+  DATA.news.forEach(function(n) {
+    c.innerHTML += '<div class="news-item"><span class="news-tag ' + tagClass(n.impact) + '">' + n.impact + '</span><div class="news-body">' + n.text + '</div></div>';
+  });
+
+  // ---- ⑦ 推荐基金 ----
+  root.appendChild(el('div', 'card'));
+  c = root.lastChild;
+  c.innerHTML = '<div class="card-title"><span class="dot" style="background:var(--purple)"></span>推荐基金<span class="tag">ETF适合择时·主动型适合长期</span></div>';
+  ['up', 'mid', 'down'].forEach(function(layer) {
+    var funds = DATA.funds.filter(function(f) { return f.layer === layer; });
+    if (funds.length === 0) return;
+    var l = layers[layer];
+    // 找该层 sector 的平均 PE 分位做参考
+    var layerSectors = DATA.sectors.filter(function(s) { return s.layer === layer; });
+    var hasData = layerSectors.length > 0;
+    var avgPE = hasData ? layerSectors.reduce(function(sum, s) { return sum + s.pe_pct; }, 0) / layerSectors.length : 0;
+    var sec = el('div', 'fund-section');
+    sec.innerHTML = '<div class="fund-section-title" style="color:' + l.color + '"><span class="bar" style="background:' + l.bg + '"></span>' + l.name + ' <span style="font-size:10px;font-weight:400;color:var(--muted)">' + l.tip + '</span></div><div class="fund-grid"></div>';
+    var grid = sec.querySelector('.fund-grid');
+    funds.forEach(function(f) {
+      var sigHTML = hasData ? fundSigBadge(avgPE) : '<span style="font-size:9px;color:var(--muted)">暂无数据</span>';
+      grid.innerHTML += '<div class="fund-item"><div class="fund-name">' + f.name + '</div><div class="fund-code">' + f.code + '</div><div class="fund-type">' + f.type + '</div>' + sigHTML + '</div>';
+    });
+    c.appendChild(sec);
+  });
+  c.innerHTML += '<div style="margin-top:12px;padding:10px;border-radius:8px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.15)"><div style="font-size:11px;color:var(--purple);line-height:1.7"><b>💡 选择建议：</b><br>• 有股票账户、想择时 → 选 <b>ETF</b>（T+0交易，费率低）<br>• 没股票账户、想定投 → 选 <b>主动型</b>（支付宝/天天基金可买）<br>• 上游标的集中 → ETF足够覆盖<br>• 下游标的分散 → 主动型更易挖掘黑马</div></div>';
+
+  // ---- ⑧ 今日操作建议 ----
+  root.appendChild(el('div', 'card'));
+  c = root.lastChild;
+  c.innerHTML = '<div class="card-title"><span class="dot" style="background:var(--green)"></span>今日操作建议</div>';
+  c.innerHTML += '<div class="advice-top">🧘</div><div class="advice-title">' + (DATA.advice_title || '核心策略') + '</div><div class="advice-list">' + DATA.advice + '</div><div class="advice-footnote">⚠ 分析参考，不构成投资建议。投资有风险，入市需谨慎。</div>';
+
+  // ---- 页脚 ----
+  root.appendChild(el('div', 'footer', DATA.footer_text || '数据来源：公开市场信息'));
+}
+
+render();
+</script>
+</body>
+</html>
