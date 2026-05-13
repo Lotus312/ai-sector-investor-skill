@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+"""
+AI板块投资报告 PDF 渲染脚本
+
+用法:
+    python scripts/render_pdf.py <html_path> <output_path>
+
+示例:
+    python scripts/render_pdf.py templates/ai-sector-briefing.html output/AI板块投资报告.pdf
+"""
+
+import sys
+import os
+from pathlib import Path
+
+def html_to_pdf(html_path, output_path):
+    """
+    使用 Playwright 将 HTML 渲染为 PDF
+    
+    Args:
+        html_path: HTML 文件路径
+        output_path: 输出 PDF 路径
+    """
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        print("错误：未安装 Playwright。请运行以下命令安装：")
+        print("  pip install playwright --break-system-packages")
+        print("  python -m playwright install chromium")
+        print("  python -m playwright install-deps chromium")
+        sys.exit(1)
+    
+    # 确保输出目录存在
+    output_dir = Path(output_path).parent
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page(viewport={'width': 480, 'height': 900})
+        
+        # 加载 HTML 文件
+        html_absolute = Path(html_path).resolve()
+        page.goto(f'file://{html_absolute}')
+        page.wait_for_load_state('networkidle')
+        
+        # 生成 PDF
+        page.pdf(
+            path=output_path,
+            width='480px',
+            print_background=True,
+            margin={'top': '10mm', 'right': '10mm', 'bottom': '10mm', 'left': '10mm'}
+        )
+        browser.close()
+    
+    print(f"✓ PDF生成成功: {output_path}")
+
+
+def main():
+    if len(sys.argv) != 3:
+        print("用法: python scripts/render_pdf.py <html_path> <output_path>")
+        print("示例: python scripts/render_pdf.py templates/ai-sector-briefing.html output/report.pdf")
+        sys.exit(1)
+    
+    html_path = sys.argv[1]
+    output_path = sys.argv[2]
+    
+    if not os.path.exists(html_path):
+        print(f"错误: HTML 文件不存在: {html_path}")
+        sys.exit(1)
+    
+    html_to_pdf(html_path, output_path)
+
+
+if __name__ == '__main__':
+    main()
