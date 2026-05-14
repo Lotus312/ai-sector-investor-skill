@@ -29,7 +29,7 @@ AI 板块投资有三大痛点：
 - **择时信号系统**：PE 分位 + 恐惧贪婪指数 + MACD 三位一体判断
 - **ETF vs 主动型智能推荐**：上游标的集中→推 ETF；下游标的分散→推主动型
 - **自动增量更新**：每次运行搜索最新基金上市/清盘信息，更新知识基线
-- **Playwright 渲染 PDF**：支持完整 CSS 样式，深色主题
+- **首选 Playwright 渲染**：效果最佳，支持完整 CSS 样式（渐变仪表盘、emoji）；无法使用时降级 WeasyPrint
 
 ---
 
@@ -37,10 +37,17 @@ AI 板块投资有三大痛点：
 
 ```
 ai-sector-investor-skill/
-├── SKILL.md                          # Skill 定义文件（触发条件、执行流程、知识库）
-├── README.md                         # 本文件
+├── SKILL.md                              # Skill 定义（触发/流程/规则）
+├── README.md                             # 本文件
+├── references/                           # 知识基线（独立维护）
+│   ├── market-baseline.md                # AI产业链基线、赛道与基金映射
+│   └── investment-rules.md               # 择时信号规则、季度轮动配置
+├── scripts/                              # 执行脚本
+│   ├── render_pdf.py                     # Playwright 首选（效果最佳）
+│   └── render_pdf_simple.py              # WeasyPrint 兜底（无需浏览器）
 └── templates/
-    └── ai-sector-briefing.html       # 数据驱动 HTML 模板（纯 CSS，移动端适配）
+    ├── ai-sector-briefing-playwright.html  # 完整效果版（conic-gradient、emoji）
+    └── ai-sector-briefing-weasyprint.html  # 兼容降级版（纯色、CSS 圆点）
 ```
 
 ---
@@ -50,10 +57,15 @@ ai-sector-investor-skill/
 ### 前置要求
 
 ```bash
-# 安装 Playwright（首次使用）
+# 首选 Playwright（效果最佳）
 pip install playwright --break-system-packages
 python -m playwright install chromium
 python -m playwright install-deps chromium
+python scripts/render_pdf.py templates/ai-sector-briefing-playwright.html output/AI板块投资报告.pdf
+
+# 降级 WeasyPrint（Playwright 无法使用时）
+pip install weasyprint --break-system-packages
+python scripts/render_pdf_simple.py templates/ai-sector-briefing-playwright.html output/AI板块投资报告.pdf
 ```
 
 ### 在 TRAE SOLO 中使用
@@ -101,9 +113,7 @@ python -m playwright install-deps chromium
      ↓
 注入 HTML 模板(DATA 对象)
      ↓
-JS 动态渲染(纯 CSS 图表)
-     ↓
-Playwright → PDF
+首选 Playwright → PDF（降级 WeasyPrint）
 ```
 
 ---

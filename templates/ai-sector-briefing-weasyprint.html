@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>AI板块投资报告</title>
+<style>
+@page{size:A4;margin:0}
+:root{--bg:#080d1a;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.07);--text:#e2e8f0;--muted:#94a3b8;--blue:#60a5fa;--purple:#a78bfa;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--orange:#f97316}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:#080d1a;min-height:100%}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;color:var(--text);padding:15mm;font-size:14px;line-height:1.5}
+.container{max-width:680px;margin:0 auto;padding:15px}
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;margin-bottom:10px;background:var(--card);border-radius:12px;border:1px solid var(--border)}
+.header-l{display:flex;align-items:center;gap:10px}
+.header-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700}
+.header-info h1{font-size:16px;font-weight:700;color:var(--blue)}
+.header-info .date{font-size:11px;color:var(--muted)}
+.signal{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap}
+.signal.warn{background:rgba(251,191,36,.12);color:var(--yellow);border:1px solid rgba(251,191,36,.25)}
+.signal.danger{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.signal.safe{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.25)}
+.card{background:var(--card);border-radius:12px;border:1px solid var(--border);padding:14px;margin-bottom:10px}
+.card-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;margin-bottom:12px}
+.card-title .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.card-title .tag{font-size:10px;color:var(--muted);margin-left:auto}
+.bar-group{margin-bottom:10px}
+.bar-group:last-child{margin-bottom:0}
+.bar-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.bar-label .name{color:var(--text)}
+.bar-label .val{font-weight:600}
+.bar-track{height:8px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px}
+/* WeasyPrint 专用：纯色替代渐变 */
+.bar-fill.red{background:var(--red)}
+.bar-fill.yellow{background:var(--yellow)}
+.bar-fill.green{background:var(--green)}
+.bar-fill.blue{background:var(--blue)}
+.fear-wrap{display:flex;align-items:center;gap:20px;justify-content:center;padding:10px 0}
+/* WeasyPrint 专用：纯色圆环替代 conic-gradient */
+.fear-ring{width:100px;height:100px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;position:relative;background:var(--green)}
+.fear-ring.red{background:var(--red)}
+.fear-ring.orange{background:var(--orange)}
+.fear-ring.yellow{background:var(--yellow)}
+.fear-inner{width:72px;height:72px;border-radius:50%;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.fear-val{font-size:28px;font-weight:800}
+.fear-label{font-size:10px;color:var(--muted);margin-top:2px}
+.fear-legend{font-size:11px;color:var(--muted);line-height:1.8}
+.heat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.heat-item{background:rgba(255,255,255,0.03);border-radius:8px;padding:8px 10px}
+.heat-item .heat-row{display:flex;justify-content:space-between;align-items:center}
+.heat-item .heat-name{font-size:12px}
+.heat-item .heat-pct{font-size:11px;font-weight:600}
+.heat-item .heat-bar{height:5px;border-radius:3px;margin-top:4px}
+.heat-item .heat-note{font-size:10px;color:var(--muted);margin-top:2px}
+.section-label{font-size:13px;font-weight:700;margin:0 0 10px 0;display:flex;align-items:center;gap:6px}
+.section-label .bar{width:3px;height:14px;border-radius:2px;display:inline-block}
+.flow-row{display:flex;justify-content:space-around;text-align:center;margin-bottom:10px}
+.flow-item .flow-label{font-size:10px;color:var(--muted)}
+.flow-item .flow-val{font-size:15px;font-weight:700;margin-top:2px}
+.flow-bar-track{height:8px;background:rgba(255,255,255,0.08);border-radius:4px;display:flex;overflow:hidden;margin-top:2px}
+.flow-bar-north{background:var(--blue);border-radius:4px 0 0 4px}
+.flow-bar-main{background:var(--purple);border-radius:0 4px 4px 0}
+.flow-sub{display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--muted)}
+.sig-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.sig-item:last-child{border-bottom:none}
+.sig-icon{width:18px;height:18px;border-radius:50%;flex-shrink:0}
+.sig-icon.red{background:var(--red)}
+.sig-icon.yellow{background:var(--yellow)}
+.sig-icon.green{background:var(--green)}
+.sig-info{flex:1}
+.sig-name{font-size:13px;font-weight:600}
+.sig-reason{font-size:11px;color:var(--muted)}
+.sig-badge{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;flex-shrink:0}
+.sig-badge.sell{background:rgba(239,68,68,.15);color:var(--red)}
+.sig-badge.hold{background:rgba(251,191,36,.15);color:var(--yellow)}
+.sig-badge.buy{background:rgba(52,211,153,.15);color:var(--green)}
+.news-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;gap:8px;align-items:flex-start}
+.news-item:last-child{border-bottom:none}
+.news-tag{padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;flex-shrink:0;white-space:nowrap}
+.news-tag.up{background:rgba(52,211,153,.15);color:var(--green)}
+.news-tag.down{background:rgba(239,68,68,.15);color:var(--red)}
+.news-tag.mid{background:rgba(148,163,184,.12);color:var(--muted)}
+.news-body{font-size:12px;line-height:1.6}
+.fund-section{margin-bottom:12px}
+.fund-section:last-child{margin-bottom:0}
+.fund-section-title{font-size:12px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.fund-section-title .bar{width:3px;height:12px;border-radius:2px}
+.fund-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.fund-item{background:rgba(255,255,255,0.02);border-radius:6px;padding:6px 8px;border:1px solid rgba(255,255,255,0.04)}
+.fund-item .fund-name{font-size:11px;font-weight:600;margin-bottom:2px}
+.fund-item .fund-code{font-size:9px;color:var(--muted)}
+.fund-item .fund-type{font-size:9px;color:var(--muted);margin-top:1px}
+.fund-item .fund-sig{font-size:9px;margin-top:3px;padding:2px 6px;border-radius:4px;display:inline-block}
+.fund-sig.sell{background:rgba(239,68,68,.15);color:var(--red)}
+.fund-sig.hold{background:rgba(251,191,36,.15);color:var(--yellow)}
+.fund-sig.buy{background:rgba(52,211,153,.15);color:var(--green)}
+.advice-top{text-align:center;font-size:36px;margin:6px 0}
+.advice-title{text-align:center;font-size:15px;font-weight:700;color:var(--purple);margin-bottom:10px}
+.advice-list{font-size:12px;color:var(--muted);line-height:2}
+.advice-list b{color:var(--text)}
+.advice-footnote{margin-top:10px;padding:8px;border-radius:6px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.15);font-size:10px;color:var(--purple);text-align:center}
+.footer{text-align:center;color:var(--muted);font-size:10px;padding:10px 0;margin-top:4px}
+</style>
+</head>
+<body>
+<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:#080d1a;z-index:-1"></div>
+<div class="container">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-l">
+    <div class="header-icon">AI</div>
+    <div class="header-info">
+      <h1>AI板块投资报告</h1>
+      <div class="date">{{date}}</div>
+    </div>
+  </div>
+  <div class="signal {{signal_level}}">{{signal_text}}</div>
+</div>
+
+<!-- ① 估值温度计 -->
+<div class="card">
+  <div class="card-title"><span class="dot" style="background:var(--blue)"></span>估值温度计<span class="tag">PE·近5年百分位</span></div>
+  {{#indices}}
+  <div class="bar-group">
+    <div class="bar-label">
+      <span class="name">{{name}}{{#if warning}} [高]{{/if}}</span>
+      <span class="val" style="color:{{color}}">{{pe_pct}}%</span>
+    </div>
+    <div class="bar-track">
+      <div class="bar-fill {{bar_class}}" style="width:{{pe_pct}}%"></div>
+    </div>
+  </div>
+  {{/indices}}
+</div>
+
+<!-- ② 恐惧贪婪 -->
+<div class="card">
+  <div class="card-title"><span class="dot" style="background:var(--yellow)"></span>恐惧贪婪指数<span class="tag">今日</span></div>
+  <div class="fear-wrap">
+    <div class="fear-ring {{fear_ring_class}}">
+      <div class="fear-inner">
+        <span class="fear-val" style="color:{{fear_color}}">{{fear_value}}</span>
+        <span class="fear-label">{{fear_zone}}</span>
+      </div>
+    </div>
+    <div class="fear-legend">
+      <div>● 0-25 极度恐惧</div>
+      <div>● 25-50 中性</div>
+      <div>● 50-75 偏贪婪</div>
+      <div>● 75-100 极度贪婪</div>
+    </div>
+  </div>
+</div>
+
+<!-- ③ AI产业链细分赛道 -->
+<div class="card">
+  <div class="card-title"><span class="dot" style="background:var(--purple)"></span>AI产业链细分赛道<span class="tag">涨跌+估值</span></div>
+  {{#layer_sections}}
+  <div class="section-label"><span class="bar" style="background:{{layer_color}}"></span>{{layer_name}}</div>
+  <div class="heat-grid">
+    {{#sectors}}
+    <div class="heat-item">
+      <div class="heat-row">
+        <span class="heat-name">{{name}}</span>
+        <span class="heat-pct" style="color:{{change_color}}">{{change}}</span>
+      </div>
+      <div class="heat-bar" style="width:{{pe_pct}}%;background:{{bar_bg}}"></div>
+      <div class="heat-note">PE分位{{pe_pct}}% · {{status}}</div>
+    </div>
+    {{/sectors}}
+  </div>
+  <div style="height:6px"></div>
+  {{/layer_sections}}
+</div>
+
+<!-- ④ 资金流向 -->
+<div class="card">
+  <div class="card-title"><span class="dot" style="background:var(--orange)"></span>资金流向<span class="tag">电子·通信板块</span></div>
+  <div class="flow-row">
+    <div class="flow-item">
+      <div class="flow-label">北向·近1日</div>
+      <div class="flow-val" style="color:var(--blue)">{{north_1d}}</div>
+    </div>
+    <div class="flow-item">
+      <div class="flow-label">北向·近5日</div>
+      <div class="flow-val" style="color:var(--blue)">{{north_5d}}</div>
+    </div>
+    <div class="flow-item">
+      <div class="flow-label">北向·近20日</div>
+      <div class="flow-val" style="color:var(--blue)">{{north_20d}}</div>
+    </div>
+  </div>
+  <div class="flow-bar-track">
+    <div class="flow-bar-north" style="width:60%"></div>
+    <div class="flow-bar-main" style="width:40%"></div>
+  </div>
+  <div class="flow-sub">
+    <span>北向：{{north_1d}}（电子+通信）</span>
+    <span>主力：{{main_1d}}</span>
+  </div>
+</div>
+
+<!-- ⑤ 择时信号面板 -->
+<div class="card">
+  <div class="card-title"><span class="dot" style="background:var(--purple)"></span>择时信号面板<span class="tag">多空判断</span></div>
+  {{#signals}}
+  <div class="sig-item">
+    <span class="sig-icon {{icon_class}}"></span>
+    <div class="sig-info">
+      <div class="sig-name">{{name}}</div>
+      <div class="sig-reason">{{reason}}</div>
+    </div>
+    <span class="sig-badge {{badge_class}}">{{badge_text}}</span>
+  </div>
+  {{/signals}}
+</div>
+
+<!-- ⑥ 资讯 -->
+<div class="card">
+  <div class="card-title"><span class="dot" style="background:var(--green)"></span>AI产业重要资讯<span class="tag">今日</span></div>
+  {{#news}}
+  <div class="news-item">
+    <span class="news-tag {{tag_class}}">{{impact}}</span>
+    <div class="news-body">{{text}}</div>
+  </div>
+  {{/news}}
+</div>
+
+<!-- ⑦ 推荐基金 -->
+<div class="card">
+  <div class="card-title"><span class="dot" style="background:var(--purple)"></span>推荐基金<span class="tag">ETF适合择时·主动型适合长期</span></div>
+  {{#fund_sections}}
+  <div class="fund-section">
+    <div class="fund-section-title" style="color:{{layer_color}}">
+      <span class="bar" style="background:{{layer_bg}}"></span>{{layer_name}} <span style="font-size:10px;font-weight:400;color:var(--muted)">{{layer_tip}}</span>
+    </div>
+    <div class="fund-grid">
+      {{#funds}}
+      <div class="fund-item">
+        <div class="fund-name">{{name}}</div>
+        <div class="fund-code">{{code}}</div>
+        <div class="fund-type">{{type}}</div>
+        <span class="fund-sig {{sig_class}}">{{sig_text}}</span>
+      </div>
+      {{/funds}}
+    </div>
+  </div>
+  {{/fund_sections}}
+  <div style="margin-top:12px;padding:10px;border-radius:8px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.15)">
+    <div style="font-size:11px;color:var(--purple);line-height:1.7">
+      <b>选择建议：</b><br>
+      • 有股票账户、想择时 → 选 <b>ETF</b>（T+0交易，费率低）<br>
+      • 没股票账户、想定投 → 选 <b>主动型</b>（支付宝/天天基金可买）<br>
+      • 上游标的集中 → ETF足够覆盖<br>
+      • 下游标的分散 → 主动型更易挖掘黑马
+    </div>
+  </div>
+</div>
+
+<!-- ⑧ 今日操作建议 -->
+<div class="card">
+  <div class="card-title"><span class="dot" style="background:var(--green)"></span>今日操作建议</div>
+  <div class="advice-top">
+    <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;margin:0 auto">
+      <span style="font-size:24px;color:#fff;font-weight:bold">AI</span>
+    </div>
+  </div>
+  <div class="advice-title">{{advice_title}}</div>
+  <div class="advice-list">{{{advice}}}</div>
+  <div class="advice-footnote">分析参考，不构成投资建议。投资有风险，入市需谨慎。</div>
+</div>
+
+<!-- 页脚 -->
+<div class="footer">{{footer_text}}</div>
+
+</div>
+</body>
+</html>

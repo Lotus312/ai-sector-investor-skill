@@ -7,8 +7,8 @@
 <style>
 :root{--bg:#080d1a;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.07);--text:#e2e8f0;--muted:#94a3b8;--blue:#60a5fa;--purple:#a78bfa;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--orange:#f97316}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:10px;font-size:14px;line-height:1.5}
-.container{max-width:480px;margin:0 auto}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:15mm;font-size:14px;line-height:1.5}
+.container{max-width:680px;margin:0 auto}
 .header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;margin-bottom:10px;background:var(--card);border-radius:12px;border:1px solid var(--border)}
 .header-l{display:flex;align-items:center;gap:10px}
 .header-icon{font-size:28px}
@@ -203,8 +203,13 @@ function render() {
   c.innerHTML = '<div class="card-title"><span class="dot" style="background:var(--yellow)"></span>恐惧贪婪指数<span class="tag">今日</span></div>';
   var fg = DATA.fear_greed;
   var fgColor = fg.value >= 75 ? 'var(--red)' : fg.value >= 50 ? 'var(--yellow)' : fg.value >= 25 ? 'var(--orange)' : 'var(--green)';
+  // 双方案兼容：Playwright 用渐变，WeasyPrint 用纯色降级
   var fgGrad = 'conic-gradient(var(--green) 0% 25%, var(--yellow) 25% 50%, var(--orange) 50% 75%, var(--red) 75% 100%)';
-  c.innerHTML += '<div class="fear-wrap"><div class="fear-ring" style="background:' + fgGrad + '"><div class="fear-inner"><span class="fear-val" style="color:' + fgColor + '">' + fg.value + '</span><span class="fear-label">' + fg.zone + '</span></div></div><div class="fear-legend"><div>🟢 0-25 极度恐惧</div><div>🟡 25-50 中性</div><div>🟠 50-75 偏贪婪</div><div>🔴 75-100 极度贪婪</div></div></div>';
+  var fgBg = fg.value >= 75 ? 'var(--red)' : fg.value >= 50 ? 'var(--orange)' : fg.value >= 25 ? 'var(--yellow)' : 'var(--green)';
+  // 检测是否支持 conic-gradient（Playwright 支持，WeasyPrint 不支持）
+  var supportsConic = CSS.supports && CSS.supports('background', 'conic-gradient(red 0%, blue 100%)');
+  var ringBg = supportsConic ? fgGrad : fgBg;
+  c.innerHTML += '<div class="fear-wrap"><div class="fear-ring" style="background:' + ringBg + '"><div class="fear-inner"><span class="fear-val" style="color:' + fgColor + '">' + fg.value + '</span><span class="fear-label">' + fg.zone + '</span></div></div><div class="fear-legend"><div>🟢 0-25 极度恐惧</div><div>🟡 25-50 中性</div><div>🟠 50-75 偏贪婪</div><div>🔴 75-100 极度贪婪</div></div></div>';
 
   // ---- ③ AI产业链细分赛道 ----
   root.appendChild(el('div', 'card'));

@@ -6,7 +6,7 @@ AI板块投资报告 PDF 渲染脚本
     python scripts/render_pdf.py <html_path> <output_path>
 
 示例:
-    python scripts/render_pdf.py templates/ai-sector-briefing.html output/AI板块投资报告.pdf
+    python scripts/render_pdf.py templates/ai-sector-briefing-playwright.html output/AI板块投资报告.pdf
 """
 
 import sys
@@ -46,9 +46,9 @@ def html_to_pdf(html_path, output_path):
         # 生成 PDF
         page.pdf(
             path=output_path,
-            width='480px',
+            format='A4',
             print_background=True,
-            margin={'top': '10mm', 'right': '10mm', 'bottom': '10mm', 'left': '10mm'}
+            margin={'top': '0', 'right': '0', 'bottom': '0', 'left': '0'}
         )
         browser.close()
     
@@ -58,7 +58,7 @@ def html_to_pdf(html_path, output_path):
 def main():
     if len(sys.argv) != 3:
         print("用法: python scripts/render_pdf.py <html_path> <output_path>")
-        print("示例: python scripts/render_pdf.py templates/ai-sector-briefing.html output/report.pdf")
+        print("示例: python scripts/render_pdf.py templates/ai-sector-briefing-playwright.html output/report.pdf")
         sys.exit(1)
     
     html_path = sys.argv[1]
