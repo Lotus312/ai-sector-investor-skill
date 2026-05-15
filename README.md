@@ -56,17 +56,33 @@ ai-sector-investor-skill/
 
 ### 前置要求
 
-```bash
-# 首选 Playwright（效果最佳）
-pip install playwright --break-system-packages
-python -m playwright install chromium
-python -m playwright install-deps chromium
-python scripts/render_pdf.py templates/ai-sector-briefing-playwright.html output/AI板块投资报告.pdf
+**首选 — Playwright**（效果最佳，支持渐变仪表盘等高级效果）：
 
-# 降级 WeasyPrint（Playwright 无法使用时）
-pip install weasyprint --break-system-packages
-python scripts/render_pdf_simple.py templates/ai-sector-briefing-playwright.html output/AI板块投资报告.pdf
+```bash
+# 1. 安装 Python 包
+pip install playwright --break-system-packages
+
+# 2. 安装浏览器
+python -m playwright install chromium
+
+# 3. 安装系统依赖（Playwright 自动检测环境并安装正确版本）
+python -m playwright install-deps chromium
+
+# 4. 渲染
+python scripts/render_pdf.py templates/ai-sector-briefing-playwright.html output/AI板块投资报告.pdf
 ```
+
+**降级 — WeasyPrint**（Playwright 无法使用时，纯 Python 无需浏览器）：
+```bash
+pip install weasyprint --break-system-packages
+# 传入 Step 2 生成的动态 HTML，脚本自动提取 DATA 并使用 WeasyPrint 模板渲染
+python scripts/render_pdf_simple.py <动态HTML路径> output/AI板块投资报告.pdf
+```
+
+> **注意**：
+> - Playwright 需要系统级依赖库（如 libatk、libxcomposite 等），首次运行前需安装
+> - 两个脚本都接收 Step 2 生成的同一个动态 HTML 文件，不需要手动切换模板
+> - `render_pdf_simple.py` 会自动查找 `ai-sector-briefing-weasyprint.html` 模板
 
 ### 在 TRAE SOLO 中使用
 

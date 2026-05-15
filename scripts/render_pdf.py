@@ -30,6 +30,22 @@ def html_to_pdf(html_path, output_path):
         print("  python -m playwright install-deps chromium")
         sys.exit(1)
     
+    # 检查 Playwright 是否能正常启动（验证系统依赖）
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            browser.close()
+    except Exception as e:
+        error_msg = str(e).lower()
+        if "libatk" in error_msg or "shared libraries" in error_msg or "libxcomposite" in error_msg:
+            print("错误：Playwright 缺少系统依赖库。让 Playwright 自动检测并安装正确版本：")
+            print("  python -m playwright install-deps chromium")
+            print("\n如果 install-deps 失败，请尝试（需要 sudo）：")
+            print("  python -m playwright install-deps --force")
+        else:
+            print(f"错误：Playwright 启动失败: {e}")
+        sys.exit(1)
+    
     # 确保输出目录存在
     output_dir = Path(output_path).parent
     output_dir.mkdir(parents=True, exist_ok=True)
