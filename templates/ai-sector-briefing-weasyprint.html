@@ -145,10 +145,10 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;color:var(--text);pa
       </div>
     </div>
     <div class="fear-legend">
-      <div>● 0-25 极度恐惧</div>
-      <div>● 25-50 中性</div>
-      <div>● 50-75 偏贪婪</div>
-      <div>● 75-100 极度贪婪</div>
+      <div><span style="color:var(--green)">●</span> 0-25 极度恐惧</div>
+      <div><span style="color:var(--yellow)">●</span> 25-50 中性</div>
+      <div><span style="color:var(--orange)">●</span> 50-75 偏贪婪</div>
+      <div><span style="color:var(--red)">●</span> 75-100 极度贪婪</div>
     </div>
   </div>
 </div>
@@ -230,6 +230,9 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;color:var(--text);pa
 <!-- ⑦ 推荐基金 -->
 <div class="card">
   <div class="card-title"><span class="dot" style="background:var(--purple)"></span>推荐基金<span class="tag">ETF适合择时·主动型适合长期</span></div>
+  {{^fund_sections}}
+  <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">暂无基金推荐</div>
+  {{/fund_sections}}
   {{#fund_sections}}
   <div class="fund-section">
     <div class="fund-section-title" style="color:{{layer_color}}">
@@ -238,9 +241,10 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;color:var(--text);pa
     <div class="fund-grid">
       {{#funds}}
       <div class="fund-item">
-        <div class="fund-name">{{name}}</div>
+        <div class="fund-name">{{name}}{{#is_new}}<span style="font-size:9px;color:var(--blue);margin-left:4px">[新上]</span>{{/is_new}}</div>
         <div class="fund-code">{{code}}</div>
         <div class="fund-type">{{type}}</div>
+        {{#return_1y}}<div class="fund-return" style="font-size:11px;color:var(--green);font-weight:600">+{{return_1y}}% <span style="font-size:9px;color:var(--muted)">({{return_period}})</span></div>{{/return_1y}}
         <span class="fund-sig {{sig_class}}">{{sig_text}}</span>
       </div>
       {{/funds}}
