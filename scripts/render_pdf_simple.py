@@ -87,11 +87,9 @@ def get_icon_class(pct):
     return 'green'
 
 def get_change_color(v):
-    """获取涨跌幅颜色"""
-    if v > 3:
+    """获取涨跌幅颜色 涨绿跌红"""
+    if v >= 0:
         return 'var(--green)'
-    if v > 0:
-        return 'var(--blue)'
     return 'var(--red)'
 
 def get_news_tag_class(impact):
@@ -106,10 +104,13 @@ def build_context(data):
     """构建模板上下文"""
     ctx = {}
     
-    # 基本信息
+    # 基本信息（移除emoji，避免PDF渲染成方块）
     ctx['date'] = data.get('date', '')
     ctx['signal_level'] = data.get('signal_level', 'warn')
-    ctx['signal_text'] = data.get('signal_text', '中性偏谨慎')
+    signal_text = data.get('signal_text', '中性偏谨慎')
+    # 移除emoji前缀
+    signal_text = signal_text.replace('🔴', '').replace('🟡', '').replace('🟢', '').strip()
+    ctx['signal_text'] = signal_text
     
     # 估值温度计
     ctx['indices'] = []
@@ -201,6 +202,9 @@ def build_context(data):
         if not funds:
             continue
         
+        # 同层级按近一年收益率从高到低排序
+        funds.sort(key=lambda x: x.get('return_1y', 0) or 0, reverse=True)
+        
         # 计算该层平均PE作为信号参考
         layer_sectors = [s for s in data.get('sectors', []) if s.get('layer') == layer_key]
         avg_pe = sum(s.get('pe_pct', 0) for s in layer_sectors) / len(layer_sectors) if layer_sectors else 50
@@ -214,18 +218,27 @@ def build_context(data):
             'funds': []
         }
         for f in funds:
+            # 判断是否是新基金（return_1y 为 0 或 None 视为新上）
+            return_1y = f.get('return_1y')
+            is_new = return_1y is None or return_1y == 0
             section['funds'].append({
                 'name': f.get('name', ''),
                 'code': f.get('code', ''),
                 'type': f.get('type', ''),
+                'return_1y': return_1y if not is_new else None,
+                'return_period': '近1年' if not is_new else None,
+                'is_new': is_new,
                 'sig_class': sig_class,
                 'sig_text': sig_text
             })
         ctx['fund_sections'].append(section)
     
-    # 操作建议
+    # 操作建议（移除emoji，避免PDF渲染成方块）
     ctx['advice_title'] = data.get('advice_title', '核心策略')
-    ctx['advice'] = data.get('advice', '')
+    advice = data.get('advice', '')
+    # 替换emoji为符号
+    advice = advice.replace('🔹', '•').replace('🔸', '•').replace('▸', '•')
+    ctx['advice'] = advice
     ctx['footer_text'] = data.get('footer_text', '数据来源：公开市场信息')
     
     return ctx
@@ -248,22 +261,40 @@ def render_template(template_path, context):
         
         result = re.sub(r'\{\{#if (\w+)\}\}(.*?)\{\{/if\}\}', render_cond, result, flags=re.DOTALL)
         
-        # 再处理循环 {{#key}}...{{/key}}（值必须是列表）
-        def render_loop(match):
+        # 处理 {{#key}}...{{/key}} - 列表循环或布尔条件
+        def render_section(match):
             key = match.group(1)
             inner = match.group(2)
-            items = data.get(key, [])
-            # 跳过非列表数据（如布尔值、字符串等）
-            if not isinstance(items, list):
+            val = data.get(key)
+            # 列表：循环渲染
+            if isinstance(val, list):
+                result = []
+                for item in val:
+                    rendered = render(inner, item)
+                    result.append(rendered)
+                return ''.join(result)
+            # 布尔值或真值：条件渲染
+            elif val:
+                return render(inner, data)
+            # 假值：不渲染
+            else:
                 return ''
-            result = []
-            for item in items:
-                # 递归渲染内层内容
-                rendered = render(inner, item)
-                result.append(rendered)
-            return ''.join(result)
         
-        result = re.sub(r'\{\{#(\w+)\}\}(.*?)\{\{/\1\}\}', render_loop, result, flags=re.DOTALL)
+        result = re.sub(r'\{\{#(\w+)\}\}(.*?)\{\{/\1\}\}', render_section, result, flags=re.DOTALL)
+        
+        # 处理反义条件 {{^var}}...{{/var}}（当 var 为空或不存在时显示）
+        def render_inverse(match):
+            key = match.group(1)
+            inner = match.group(2)
+            val = data.get(key)
+            # 空列表、None、空字符串都视为空
+            is_empty = (val is None or val == '' or 
+                       (isinstance(val, list) and len(val) == 0))
+            if is_empty:
+                return render(inner, data)
+            return ''
+        
+        result = re.sub(r'\{\{\^(\w+)\}\}(.*?)\{\{/\1\}\}', render_inverse, result, flags=re.DOTALL)
         
         # 最后处理变量
         def replace_var(m):
@@ -273,7 +304,7 @@ def render_template(template_path, context):
             val = data.get(key, '')
             return str(val)
         
-        result = re.sub(r'\{\{\{(\w+)\}\}|\{\{(\w+)\}\}', replace_var, result)
+        result = re.sub(r'\{\{\{(\w+)\}\}\}|\{\{(\w+)\}\}', replace_var, result)
         return result
     
     return render(template, context)
