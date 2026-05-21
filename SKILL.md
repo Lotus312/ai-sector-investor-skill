@@ -1,6 +1,6 @@
 ---
 name: ai-sector-investor
-version: 1.2.0
+version: 1.2.1
 description: "AI板块投资分析与PDF报告生成。当用户需要分析AI板块投资、查看板块轮动、获取基金推荐、生成投资报告时使用。最终输出为PDF格式。"
 ---
 
