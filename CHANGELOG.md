@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.3.2 (2026-06-10)
+
+### 更新
+- **择时信号面板升级**：从纯 PE 排序改为四维信号计分，显示 `[多X空Y]` + 各维度信号（PE/EPS/供给/增长），操作建议基于多空判断
+- **推荐基金操作建议升级**：从平均 PE 判断改为该层平均四维信号（可加仓/持有/止盈）
+- **新增 DATA 字段**：`sectors[].signal_bull` 和 `sectors[].signal_bear`（Step 1.7 四维计分结果）
+- 同步更新 Playwright 模板、WeasyPrint 模板、render_pdf_simple.py
+
 ## v1.3.1 (2026-06-10)
 
 ### 修复

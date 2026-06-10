@@ -1,6 +1,6 @@
 ---
 name: ai-sector-investor
-version: 1.3.1
+version: 1.3.2
 description: "AI板块投资分析与PDF报告生成。当用户需要分析AI板块投资、查看板块轮动、获取基金推荐、生成投资报告时使用。最终输出为PDF格式。"
 ---
 
@@ -164,8 +164,8 @@ description: "AI板块投资分析与PDF报告生成。当用户需要分析AI�
   "fear_greed": {"value": 62, "zone": "偏贪婪", "bias": -5},
   "flow": {"north_1d": 12.5, "north_5d": 38.2, "north_20d": 156.8, "main_1d": -8.3},
   "sectors": [
-    {"name": "AI训练芯片", "layer": "up", "change": 2.1, "pe_pct": 88, "eps_growth": 45, "supply_signal": "紧缺"},
-    {"name": "推理芯片/ASIC", "layer": "up", "change": 3.5, "pe_pct": 72, "eps_growth": 30, "supply_signal": "紧缺"}
+    {"name": "AI训练芯片", "layer": "up", "change": 2.1, "pe_pct": 88, "eps_growth": 45, "supply_signal": "紧缺", "signal_bull": 3, "signal_bear": 1},
+    {"name": "推理芯片/ASIC", "layer": "up", "change": 3.5, "pe_pct": 72, "eps_growth": 30, "supply_signal": "紧缺", "signal_bull": 4, "signal_bear": 0}
   ],
   "funds": [
     {"name": "广发远见智选混合A", "code": "016873", "type": "主动型", "layer": "up", "return_1y": 111.2},
@@ -189,6 +189,8 @@ description: "AI板块投资分析与PDF报告生成。当用户需要分析AI�
 | `sectors[].eps_growth` | number/null | EPS 同比增速(%)，上游/中游使用 |
 | `sectors[].supply_signal` | string/null | 供给信号：紧缺/中性/松动，上游专用 |
 | `sectors[].growth_signal` | string/null | 增长信号：加速/平稳/放缓，中下游专用 |
+| `sectors[].signal_bull` | number | Step 1.7 四维计分中看多维度数（0-4） |
+| `sectors[].signal_bear` | number | Step 1.7 四维计分中看空维度数（0-4） |
 | `flow.north_1d` | number | 北向资金近 1 日净买入（亿元） |
 | `flow.main_1d` | number | 主力资金近 1 日净买入（亿元） |
 | `fear_greed.value` | number | 恐惧贪婪指数数值(0-100) |
@@ -202,6 +204,7 @@ description: "AI板块投资分析与PDF报告生成。当用户需要分析AI�
 - `fear_greed.zone`：0-25极度恐惧 / 25-50中性 / 50-75偏贪婪 / 75-100极度贪婪
 - `fear_greed.bias`：当日值 - 近20日均值，正数=情绪升温，负数=降温
 - `eps_growth` / `supply_signal` / `growth_signal`：从 Step 1 第 2、3 次搜索提取
+- `signal_bull` / `signal_bear`：Step 1.7 四维计分结果，每赛道必须填写
 
 **建议生成规则**：
 

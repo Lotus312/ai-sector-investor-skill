@@ -213,7 +213,10 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;color:var(--text);pa
       <div class="sig-name">{{name}}</div>
       <div class="sig-reason">{{reason}}</div>
     </div>
-    <span class="sig-badge {{badge_class}}">{{badge_text}}</span>
+    <div style="text-align:right;flex-shrink:0">
+      <div style="font-size:11px;font-weight:700;color:{{score_color}}">{{score_text}}</div>
+      <span class="sig-badge {{badge_class}}">{{badge_text}}</span>
+    </div>
   </div>
   {{/signals}}
 </div>

@@ -195,20 +195,36 @@ def build_context(data):
             })
         ctx['layer_sections'].append(section)
     
-    # 择时信号（取PE最高的6个）
+    # 择时信号（使用四维信号计分，按 bear 降序取前6）
     signals = []
     for s in data.get('sectors', []):
         pct = s.get('pe_pct', 0)
-        badge_class, badge_text = get_signal_badge(pct)
+        bull = s.get('signal_bull', 0) or 0
+        bear = s.get('signal_bear', 0) or 0
+        dims = []
+        if pct: dims.append(f"PE{pct}%")
+        if s.get('eps_growth'): dims.append(f"EPS+{s['eps_growth']}%")
+        if s.get('supply_signal'): dims.append(s['supply_signal'])
+        if s.get('growth_signal'): dims.append(s['growth_signal'])
+        if bull >= 3:
+            badge_class, badge_text = 'buy', '可加仓'
+        elif bear >= 3:
+            badge_class, badge_text = 'sell', '止盈/减仓'
+        else:
+            badge_class, badge_text = 'hold', '观望'
         signals.append({
             'name': s.get('name', ''),
-            'reason': f"PE分位{pct}%",
+            'reason': ' · '.join(dims) if dims else f"PE分位{pct}%",
             'icon_class': get_icon_class(pct),
             'badge_class': badge_class,
             'badge_text': badge_text,
-            'pct': pct
+            'pct': pct,
+            'bull': bull,
+            'bear': bear,
+            'score_color': 'var(--green)' if bull >= 3 else ('var(--red)' if bear >= 3 else 'var(--yellow)'),
+            'score_text': f"[多{bull}空{bear}]"
         })
-    signals.sort(key=lambda x: x['pct'], reverse=True)
+    signals.sort(key=lambda x: (-x['bear'], x['bull']))
     ctx['signals'] = signals[:6]
     
     # 资讯
@@ -230,10 +246,16 @@ def build_context(data):
         # 同层级按近一年收益率从高到低排序
         funds.sort(key=lambda x: x.get('return_1y', 0) or 0, reverse=True)
         
-        # 计算该层平均PE作为信号参考
+        # 计算该层平均四维信号作为参考
         layer_sectors = [s for s in data.get('sectors', []) if s.get('layer') == layer_key]
-        avg_pe = sum(s.get('pe_pct', 0) for s in layer_sectors) / len(layer_sectors) if layer_sectors else 50
-        sig_class, sig_text = get_signal_badge(avg_pe)
+        avg_bull = sum(s.get('signal_bull', 0) or 0 for s in layer_sectors) / len(layer_sectors) if layer_sectors else 0
+        avg_bear = sum(s.get('signal_bear', 0) or 0 for s in layer_sectors) / len(layer_sectors) if layer_sectors else 0
+        if avg_bull >= 3:
+            sig_class, sig_text = 'buy', '可加仓'
+        elif avg_bear >= 3:
+            sig_class, sig_text = 'sell', '止盈'
+        else:
+            sig_class, sig_text = 'hold', '持有'
         
         section = {
             'layer_name': layer_info['name'],
