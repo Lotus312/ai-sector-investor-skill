@@ -124,7 +124,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;color:var(--text);pa
   {{#indices}}
   <div class="bar-group">
     <div class="bar-label">
-      <span class="name">{{name}}{{#if warning}} [高]{{/if}}</span>
+      <span class="name">{{name}}{{#warning}} [高]{{/warning}}</span>
       <span class="val" style="color:{{color}}">{{pe_pct}}%</span>
     </div>
     <div class="bar-track">
@@ -144,11 +144,13 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;color:var(--text);pa
         <span class="fear-label">{{fear_zone}}</span>
       </div>
     </div>
+    {{#bias}}<div style="font-size:10px;margin-top:6px;text-align:center;color:{{bias_color}}">偏离均值 {{bias_dir}}{{bias_abs}}点{{#bias_note}}（{{bias_note}}）{{/bias_note}}</div>{{/bias}}
     <div class="fear-legend">
       <div><span style="color:var(--green)">●</span> 0-25 极度恐惧</div>
       <div><span style="color:var(--yellow)">●</span> 25-50 中性</div>
       <div><span style="color:var(--orange)">●</span> 50-75 偏贪婪</div>
       <div><span style="color:var(--red)">●</span> 75-100 极度贪婪</div>
+      <div style="margin-top:6px"><span style="color:var(--muted);font-size:10px">偏离&gt;15点触发反共识信号</span></div>
     </div>
   </div>
 </div>
@@ -166,7 +168,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;color:var(--text);pa
         <span class="heat-pct" style="color:{{change_color}}">{{change}}</span>
       </div>
       <div class="heat-bar" style="width:{{pe_pct}}%;background:{{bar_bg}}"></div>
-      <div class="heat-note">PE分位{{pe_pct}}% · {{status}}</div>
+      <div class="heat-note">PE分位{{pe_pct}}% · {{status}}{{#sign_text}}<span style="font-size:9px;color:var(--muted)"> · {{sign_text}}</span>{{/sign_text}}</div>
     </div>
     {{/sectors}}
   </div>

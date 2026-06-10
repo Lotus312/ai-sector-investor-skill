@@ -205,7 +205,15 @@ function render() {
   var fgColor = fg.value >= 75 ? 'var(--red)' : fg.value >= 50 ? 'var(--yellow)' : fg.value >= 25 ? 'var(--orange)' : 'var(--green)';
   // 统一使用纯色，和 WeasyPrint 保持一致
   var ringBg = fg.value >= 75 ? 'var(--red)' : fg.value >= 50 ? 'var(--orange)' : fg.value >= 25 ? 'var(--yellow)' : 'var(--green)';
-  c.innerHTML += '<div class="fear-wrap"><div class="fear-ring" style="background:' + ringBg + '"><div class="fear-inner"><span class="fear-val" style="color:' + fgColor + '">' + fg.value + '</span><span class="fear-label">' + fg.zone + '</span></div></div><div class="fear-legend"><div>🟢 0-25 极度恐惧</div><div>🟡 25-50 中性</div><div>🟠 50-75 偏贪婪</div><div>🔴 75-100 极度贪婪</div></div></div>';
+  var biasHtml = '';
+  if (typeof fg.bias === 'number') {
+    var biasAbs = Math.abs(fg.bias);
+    var biasDir = fg.bias > 0 ? '▲' : '▼';
+    var biasColor = (biasAbs > 15) ? (fg.bias > 0 ? 'var(--red)' : 'var(--green)') : 'var(--muted)';
+    var biasNote = (biasAbs > 15) ? (fg.bias > 0 ? '贪婪骤升' : '恐惧骤降') : '';
+    biasHtml = '<div style="font-size:10px;margin-top:6px;text-align:center;color:' + biasColor + '">偏离均值 ' + biasDir + biasAbs + '点' + (biasNote ? '（' + biasNote + '）' : '') + '</div>';
+  }
+  c.innerHTML += '<div class="fear-wrap"><div class="fear-ring" style="background:' + ringBg + '"><div class="fear-inner"><span class="fear-val" style="color:' + fgColor + '">' + fg.value + '</span><span class="fear-label">' + fg.zone + '</span></div></div>' + biasHtml + '<div class="fear-legend"><div><span style="color:var(--green)">●</span> 0-25 极度恐惧</div><div><span style="color:var(--yellow)">●</span> 25-50 中性</div><div><span style="color:var(--orange)">●</span> 50-75 偏贪婪</div><div><span style="color:var(--red)">●</span> 75-100 极度贪婪</div><div style="margin-top:6px"><span style="color:var(--muted);font-size:10px">偏离>15点触发反共识信号</span></div></div></div>';
 
   // ---- ③ AI产业链细分赛道 ----
   root.appendChild(el('div', 'card'));
@@ -220,7 +228,12 @@ function render() {
     var grid = el('div', 'heat-grid');
     sectors.forEach(function(s) {
       var item = el('div', 'heat-item');
-      item.innerHTML = '<div class="heat-row"><span class="heat-name">' + s.name + '</span><span class="heat-pct" style="color:' + changeColor(s.change) + '">' + formatChange(s.change) + '</span></div><div class="heat-bar" style="width:' + s.pe_pct + '%;background:' + barBg(s.pe_pct) + '"></div><div class="heat-note">PE分位' + s.pe_pct + '% · ' + sectorStatus(s.pe_pct) + '</div>';
+      var signs = [];
+      if (s.eps_growth) signs.push('EPS+' + s.eps_growth + '%');
+      if (s.supply_signal) signs.push(s.supply_signal);
+      if (s.growth_signal) signs.push(s.growth_signal);
+      var signStr = signs.length > 0 ? '<span style="font-size:9px;color:var(--muted)">' + signs.join(' · ') + '</span>' : '';
+      item.innerHTML = '<div class="heat-row"><span class="heat-name">' + s.name + '</span><span class="heat-pct" style="color:' + changeColor(s.change) + '">' + formatChange(s.change) + '</span></div><div class="heat-bar" style="width:' + s.pe_pct + '%;background:' + barBg(s.pe_pct) + '"></div><div class="heat-note">PE分位' + s.pe_pct + '% · ' + sectorStatus(s.pe_pct) + signStr + '</div>';
       grid.appendChild(item);
     });
     c.appendChild(grid);

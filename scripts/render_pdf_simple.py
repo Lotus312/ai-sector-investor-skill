@@ -131,6 +131,21 @@ def build_context(data):
     ctx['fear_zone'] = fg.get('zone', '中性')
     ctx['fear_color'] = get_fear_color(fv)
     ctx['fear_ring_class'] = get_fear_ring_class(fv)
+    # 偏离信号
+    bias = fg.get('bias')
+    if bias is not None:
+        bias_abs = abs(bias)
+        ctx['bias'] = True
+        ctx['bias_dir'] = '▲' if bias > 0 else '▼'
+        ctx['bias_abs'] = bias_abs
+        if bias_abs > 15:
+            ctx['bias_note'] = '贪婪骤升' if bias > 0 else '恐惧骤降'
+            ctx['bias_color'] = 'var(--red)' if bias > 0 else 'var(--green)'
+        else:
+            ctx['bias_note'] = ''
+            ctx['bias_color'] = 'var(--muted)'
+    else:
+        ctx['bias'] = False
     
     # 资金流向
     fl = data.get('flow', {})
@@ -160,13 +175,23 @@ def build_context(data):
         for s in sectors:
             chg = s.get('change', 0)
             pct = s.get('pe_pct', 0)
+            # 组装多维信号文本
+            signs = []
+            if s.get('eps_growth'):
+                signs.append(f"EPS+{s['eps_growth']}%")
+            if s.get('supply_signal'):
+                signs.append(s['supply_signal'])
+            if s.get('growth_signal'):
+                signs.append(s['growth_signal'])
+            sign_text = ' · '.join(signs) if signs else ''
             section['sectors'].append({
                 'name': s.get('name', ''),
                 'change': format_change(chg),
                 'change_color': get_change_color(chg),
                 'pe_pct': pct,
                 'bar_bg': get_bar_bg(pct),
-                'status': get_sector_status(pct)
+                'status': get_sector_status(pct),
+                'sign_text': sign_text
             })
         ctx['layer_sections'].append(section)
     
